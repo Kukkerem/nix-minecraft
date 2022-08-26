@@ -23,15 +23,27 @@ let
     inherit (cfg) hash;
   });
 
-  files = map
-    (f: {
-      path = "${f.path}/${f.name}";
-      source = pkgs.fetchurl {
+  fetchFile = f:
+    if (lib.attrsets.hasAttrByPath [ "url" ] f)
+    then pkgs.fetchurl {
         inherit (f) sha1;
         url = builtins.replaceStrings [ " " ] [ "%20" ] f.url;
         name = lib.strings.sanitizeDerivationName f.name;
         curlOpts = "--globoff"; # do not misinterpret [] brackets
-      };
+    }
+    else pkgs.runCommandLocal f.name
+    {
+      outputHash = f.sha1;
+      outputHashAlgo = "sha1";
+      nativeBuildInputs = [ pkgs.curl pkgs.jq ];
+      SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
+    }
+    ''curl -L -o "$out" "$(curl -L 'https://addons-ecs.forgesvc.net/api/v2/addon/${toString f.curseforge.project}/file/${toString f.curseforge.file}/download-url')"'';
+
+  files = map
+    (f: {
+      path = "${f.path}/${f.name}";
+      source = fetchFile f;
     })
     (builtins.filter (f: !f.serveronly) json.files);
 
