@@ -18,10 +18,14 @@ let
   inherit (lib) mkOption mkIf types;
   cfg = config.modpack.ftb;
 
-  json = lib.importJSON (pkgs.fetchurl {
+  # json = lib.importJSON (pkgs.fetchurl {
+  #   url = "https://api.modpacks.ch/public/modpack/${toString cfg.id}/${toString cfg.version}";
+  #   inherit (cfg) hash;
+  # });
+  json = builtins.fromJSON (builtins.readFile (pkgs.fetchurl {
     url = "https://api.modpacks.ch/public/modpack/${toString cfg.id}/${toString cfg.version}";
     inherit (cfg) hash;
-  });
+  }));
 
   fetchFile = f:
     if (lib.attrsets.hasAttrByPath [ "url" ] f)

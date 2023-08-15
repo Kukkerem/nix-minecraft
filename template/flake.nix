@@ -1,5 +1,5 @@
 {
-  inputs.nix-minecraft.url = "github:12Boti/nix-minecraft";
+  inputs.nix-minecraft.url = "github:kukkerem/nix-minecraft";
 
   outputs =
     { self
