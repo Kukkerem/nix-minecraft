@@ -41,7 +41,7 @@ in
             nativeBuildInputs = [ pkgs.jsonnet ];
           }
           ''
-            jsonfile="$(find ${mcversions}/history -name '${cfg.version}.json')"
+            jsonfile="$(find ${mcversions}/history/release -name '${cfg.version}.json')"
             jsonnet -J ${./jsonnet} --tla-str-file orig_str="$jsonfile" -o $out \
               ${./jsonnet/normalize.jsonnet}
           '';
